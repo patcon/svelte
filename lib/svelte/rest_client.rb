@@ -18,8 +18,8 @@ module Svelte
       #   an exception will be raised
       #
       # @return [Faraday::Response] http response from the service
-      def call(verb:, url:, params: {}, options: {})
-        connection.send verb, url, params do |request|
+      def call(verb:, url:, consumes:, params: {}, options: {})
+        connection(request_mimetype: consumes).send verb, url, params do |request|
           request.options.timeout = options[:timeout] if options[:timeout]
         end
       rescue Faraday::TimeoutError => e
@@ -32,11 +32,20 @@ module Svelte
 
       private
 
-      def connection
+      def connection(request_mimetype:)
         @@connection ||= Faraday.new(ssl: { verify: true }) do |faraday|
-          faraday.request :json
+          faraday.request request_type(request_mimetype)
           faraday.response :json, content_type: /\bjson$/
           faraday.adapter :typhoeus
+        end
+      end
+
+      def request_type(mimetype)
+        case mimetype
+        when 'application/json'
+          return :json
+        when 'multipart/form-data', 'application/x-www-form-urlencoded'
+          return :multipart
         end
       end
     end

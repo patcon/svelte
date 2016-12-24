@@ -20,6 +20,10 @@ module Svelte
       properties['operationId']
     end
 
+    def consumes
+      properties['consumes'] && properties['consumes'][0]
+    end
+
     private
 
     def validate

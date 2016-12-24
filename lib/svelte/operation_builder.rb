@@ -13,6 +13,7 @@ module Svelte
           GenericOperation.call(
             verb: operation.verb,
             path: operation.path,
+            consumes: operation.consumes,
             configuration: configuration,
             parameters: builder.request_parameters(full_parameters: parameters),
             options: builder.options(full_parameters: parameters))
